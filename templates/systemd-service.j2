@@ -1,0 +1,16 @@
+# /etc/systemd/system/trufi.service
+[Unit]
+Description=Trufi Service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+StandardError=null
+StandardOutput=null
+WorkingDirectory={{ install_dir }}
+ExecStart=/usr/bin/docker-compose -f docker-compose.yml up -d
+ExecStop=/usr/bin/docker-compose -f docker-compose.yml down
+
+[Install]
+WantedBy=multi-user.target

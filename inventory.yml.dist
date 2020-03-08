@@ -1,0 +1,13 @@
+all:
+  hosts:
+    CHANGE_ME_TO_IP_OR_HOSTNAME:
+      ansible_user: root
+      ansible_python_interpreter: /usr/bin/python3
+      docker_username:
+      docker_password:
+      install_dir: /srv/trufi
+      hostname:
+      email:
+      region:
+      pbf_url:
+      bbox:

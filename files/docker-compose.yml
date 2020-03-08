@@ -1,0 +1,45 @@
+version: "3.3"
+
+# todo
+# - logging
+# - healthcheck otp
+# - secrets?
+
+services:
+  proxy:
+    image: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/srv/trufi/nginx/www:/var/www/html"
+      - "/srv/trufi/nginx/config:/etc/nginx/conf.d:ro"
+      - "/srv/trufi/letsencrypt/config:/etc/letsencrypt:ro"
+    depends_on:
+      - opentripplanner
+      - openmaptiles
+    restart: always
+    networks:
+      - frontend
+
+  opentripplanner:
+    image: docker.pkg.github.com/trufi-association/tools/opentripplanner:latest
+    command: --autoScan --autoReload --server
+    volumes:
+      - "/srv/trufi/graphs:/var/otp/graphs"
+      - "/srv/trufi/logs:/tmp"
+      # todo log files
+    restart: unless-stopped
+    networks:
+      - frontend
+
+  openmaptiles:
+    image: klokantech/openmaptiles-server
+    volumes:
+      - "/srv/trufi/tiles:/data"
+    restart: unless-stopped
+    networks:
+      - frontend
+
+networks:
+  frontend:

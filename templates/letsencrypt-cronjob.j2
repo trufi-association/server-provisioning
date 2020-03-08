@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd {{ install_dir }}
+./letsencrypt-renew.sh >> /var/log/certbot.log 2>&1
+docker-compose restart proxy >> /var/log/certbot.log 2>&1

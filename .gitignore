@@ -1,0 +1,6 @@
+files/graphs/*
+files/letsencrypt/config/*
+*.pem
+*.mbtiles
+!.gitkeep
+inventory.yml

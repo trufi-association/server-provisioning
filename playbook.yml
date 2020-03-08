@@ -1,0 +1,84 @@
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu disco stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
+
+    - name: Install docker-compose
+      shell: "curl -L https://github.com/docker/compose/releases/download/1.25.4/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose"
+      args:
+        creates: "/usr/bin/docker-compose"
+        warn: false
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Copy files
+      synchronize:
+        src: files/
+        dest: "{{ install_dir }}"
+        recursive: yes
+        delete: no
+
+    - name: Set up systemd unit
+      template:
+        src: templates/systemd-service.j2
+        dest: /etc/systemd/system/trufi.service
+        owner: root
+        mode: 644
+
+    - name: Write vhost config
+      template:
+        src: templates/letsencrypt-cronjob.j2
+        dest: /etc/cron.daily/trufi-letsencrypt
+        owner: root
+        mode: 755
+
+    - name: Generate Diffie-Hellman param for nginx
+      command: "openssl dhparam -dsaparam -out ./nginx/config/dhparam.pem 4096"
+      args:
+        chdir: "{{ install_dir }}"
+        creates: "{{ install_dir }}/nginx/config/dhparam.pem"
+
+    - name: Generate letsencrypt certificate
+      command: "./letsencrypt-create.sh {{ email }} {{ hostname }}"
+      args:
+        chdir: "{{ install_dir }}"
+        creates: "{{ install_dir }}/letsencrypt/config/live/{{ hostname }}/cert.pem"
+
+    - name: Log into GitHub Docker
+      docker_login:
+        registry_url: docker.pkg.github.com
+        username: "{{ docker_username }}"
+        password: "{{ docker_password }}"
+
+    - name: Build OTP graph
+      command: "./build-graph.sh {{ region | quote }} {{ pbf_url | quote }} {{ bbox | quote }}"
+      args:
+        chdir: "{{ install_dir }}"
+        creates: "{{ install_dir }}/graphs/{{ region }}/Graph.obj"
+
+    - name: Start services
+      systemd:
+        state: started
+        daemon_reload: yes
+        name: trufi

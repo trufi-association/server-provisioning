@@ -1,0 +1,39 @@
+{
+  "styles": {
+    "standard": [
+      "osm-bright",
+      "hybrid",
+      "satellite"
+    ],
+    "custom": [
+      "terrain.json"
+    ],
+    "lang": "native",
+    "langLatin": true,
+    "langAlts": true
+  },
+  "settings": {
+    "serve": {
+      "vector": true,
+      "raster": true,
+      "services": false,
+      "static": false
+    },
+    "raster": {
+      "format": "PNG_256",
+      "hidpi": 2,
+      "maxsize": 2048
+    },
+    "server": {
+      "title": "trufi.app Map Tiles",
+      "redirect": "https://www.trufi.app",
+      "domains": []
+    },
+    "memcache": {
+      "size": 56.5,
+      "servers": [
+        "localhost:11211"
+      ]
+    }
+  }
+}
