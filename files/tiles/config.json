@@ -1,13 +1,11 @@
 {
   "styles": {
     "standard": [
+      "klokantech-terrain",
       "osm-bright",
-      "hybrid",
-      "satellite"
+      "hybrid"
     ],
-    "custom": [
-      "terrain.json"
-    ],
+    "custom": [],
     "lang": "native",
     "langLatin": true,
     "langAlts": true
