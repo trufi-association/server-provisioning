@@ -8,3 +8,4 @@ all:
       install_dir: /srv/trufi
       hostname: SERVICE_HOSTNAME
       email: CONTACT_EMAIL
+      build_graphs: yes
