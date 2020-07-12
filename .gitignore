@@ -1,5 +1,7 @@
 files/graphs/*
 files/letsencrypt/config/*
+files/nginx/config/*
+!files/nginx/config/security.conf
 *.pem
 *.mbtiles
 !.gitkeep
