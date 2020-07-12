@@ -68,14 +68,23 @@
     - name: Log into GitHub Docker
       docker_login:
         registry_url: docker.pkg.github.com
-        username: "{{ docker_username }}"
+        username: "{{ docker_username }}"
         password: "{{ docker_password }}"
 
-    - name: Build OTP graph
-      command: "./build-graph.sh {{ region | quote }} {{ pbf_url | quote }} {{ bbox | quote }}"
+    - name: Get all graph dirs
+      find:
+        paths: "{{ install_dir }}/graphs"
+        file_type: directory
+        excludes: v?.?.?.? # EPSG dirs
+      register: graph_dirs
+
+    - name: Build OTP graphs
+      command: "./build-graph.sh {{ install_dir + '/graphs' | quote }} {{ item.path | basename | quote }}"
       args:
         chdir: "{{ install_dir }}"
-        creates: "{{ install_dir }}/graphs/{{ region }}/Graph.obj"
+        creates: "{{ item.path }}/Graph.obj"
+      with_items: "{{ graph_dirs.files }}"
+      when: build_graphs|bool
 
     - name: Start services
       systemd:

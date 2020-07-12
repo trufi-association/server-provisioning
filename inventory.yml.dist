@@ -8,6 +8,3 @@ all:
       install_dir: /srv/trufi
       hostname: SERVICE_HOSTNAME
       email: CONTACT_EMAIL
-      region: bolivia-cochabamba
-      pbf_url: https://download.geofabrik.de/south-america/bolivia-latest.osm.pbf
-      bbox: -66.376555,-17.57727,-65.96397,-17.276198
